@@ -1,6 +1,7 @@
-import com.typesafe.sbt.pgp.PgpKeys
+import com.jsuereth.sbtpgp.PgpKeys
+import scala.xml._
+import java.net.URL
 import Dependencies._
-
 
 val unusedOptions = Def.setting(
   CrossVersion.partialVersion(scalaVersion.value) match {
@@ -11,10 +12,11 @@ val unusedOptions = Def.setting(
   }
 )
 
-
-lazy val projectSettings = Seq(
+lazy val frgConfFacadeSettings = Seq(
   organization := "com.fragnostic",
-  crossScalaVersions := Seq("2.12.11", "2.11.12", "2.13.1"),
+  fork in Test := true,
+  baseDirectory in Test := file("."),
+  crossScalaVersions := Seq("2.12.11", "2.11.12", "2.13.3"),
   scalaVersion := crossScalaVersions.value.head,
   scalacOptions ++= unusedOptions.value,
   scalacOptions ++= Seq(
@@ -37,28 +39,9 @@ lazy val projectSettings = Seq(
     "org.scala-lang" % "scala-reflect"  % scalaVersion.value,
     "org.scala-lang" % "scala-compiler" % scalaVersion.value
   )
-) ++ Seq(Compile, Test).flatMap(c =>
+) ++ mavenCentralFrouFrou ++ Seq(Compile, Test).flatMap(c =>
   scalacOptions in (c, console) --= unusedOptions.value
 )
-
-
-lazy val project = Project(
-  id = "fragnostic-conf-facade",
-  base = file(".")).settings(
-    projectSettings ++ Seq(
-      name := "fragnostic-conf-facade",
-      artifacts := Classpaths.artifactDefs(Seq(packageDoc in Compile, makePom in Compile)).value,
-      updateOptions := updateOptions.value.withLatestSnapshots(false),
-      packagedArtifacts := Classpaths.packaged(Seq(packageDoc in Compile, makePom in Compile)).value,
-      description := "fragnostic conf facade",
-      shellPrompt := { state =>
-        s"sbt:${Project.extract(state).currentProject.id}" + Def.withColor("> ", Option(scala.Console.CYAN))
-      }
-    )
-  ).aggregate(
-    fragnosticConfFacade
-  ).enablePlugins()
-
 
 lazy val manifestSetting = packageOptions += {
   Package.ManifestAttributes(
@@ -75,13 +58,43 @@ lazy val manifestSetting = packageOptions += {
   )
 }
 
+// Things we care about primarily because Maven Central demands them
+lazy val mavenCentralFrouFrou = Seq(
+  homepage := Some(new URL("http://www.fragnostic.com.br")),
+  startYear := Some(2020),
+  pomExtra := pomExtra.value ++ Group(
+    <developers>
+      <developer>
+        <id>fbrule</id>
+        <name>Fernando Brûlé</name>
+        <url>https://github.com/fernandobrule</url>
+      </developer>
+    </developers>
+  )
+)
 
 lazy val doNotPublish = Seq(publish := {}, publishLocal := {}, PgpKeys.publishSigned := {}, PgpKeys.publishLocalSigned := {})
 
+lazy val frgConfFacadeProject = Project(
+  id = "fragnostic-conf-facade-project",
+  base = file(".")).settings(
+    frgConfFacadeSettings ++ Seq(
+    name := "fragnostic conf facade project",
+    artifacts := Classpaths.artifactDefs(Seq(packageDoc in Compile, makePom in Compile)).value,
+    packagedArtifacts := Classpaths.packaged(Seq(packageDoc in Compile, makePom in Compile)).value,
+    description := "A Fragnostic Conf Cache",
+    shellPrompt := { state =>
+      s"sbt:${Project.extract(state).currentProject.id}" + Def.withColor("> ", Option(scala.Console.CYAN))
+    }
+  ) ++ Defaults.packageTaskSettings(
+    packageDoc in Compile, (unidoc in Compile).map(_.flatMap(Path.allSubpaths))
+  )).aggregate(
+    frgConfFacade
+  ).enablePlugins(ScalaUnidocPlugin)
 
-lazy val fragnosticConfFacade = Project(
+lazy val frgConfFacade = Project(
   id = "fragnostic-conf-facade",
-  base = file("fragnostic-conf-facade")).settings(projectSettings ++ Seq(
+  base = file("fragnostic-conf-facade")).settings(frgConfFacadeSettings ++ Seq(
     libraryDependencies ++= Seq(
       logbackClassic,
       slf4jApi,
@@ -91,10 +104,9 @@ lazy val fragnosticConfFacade = Project(
       fragnosticConfEnv,
       fragnosticConfProps,
       fragnosticConfDb
-    ) ,
-    description := "fragnostic-conf-facade"
+    ),
+    description := "fragnostic conf facade"
   )
 ) dependsOn(
+  //
 )
-
-
