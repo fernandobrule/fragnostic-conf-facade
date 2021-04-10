@@ -7,6 +7,7 @@ import com.fragnostic.conf.env.service.CakeConfEnvService
 import com.fragnostic.conf.props.service.CakeConfPropsService
 import org.slf4j.{ Logger, LoggerFactory }
 
+@SerialVersionUID(234234234L)
 trait ConfIntSupport extends TypesSupport {
 
   private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
