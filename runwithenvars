@@ -4,5 +4,6 @@
 export REDIS_HOST=localhost
 export REDIS_PORT=6379
 
+export FOCUSED_CALENDAR_SERVICE_TODAY_MINUS_DAYS=56
 
 ./sbt -v -213 -Dsbt.io.implicit.relative.glob.conversion=allow
