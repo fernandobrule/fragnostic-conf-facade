@@ -1,7 +1,7 @@
 package com.fragnostic.conf.service.support
 
 import com.fragnostic.conf.base.service.support.TypesSupport
-import com.fragnostic.conf.cache.service.{ CakeCacheService, CakeConfCacheService }
+import com.fragnostic.conf.cache.service.CakeConfCacheService
 import com.fragnostic.conf.db.service.CakeConfDbService
 import com.fragnostic.conf.env.service.CakeConfEnvService
 import com.fragnostic.conf.props.service.CakeConfPropsService
@@ -12,7 +12,7 @@ trait ConfShortSupport extends TypesSupport {
   private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
 
   def cacheGetShort(key: String, valueDefault: Short): Short =
-    envGetShort(CakeConfCacheService.confServiceApi.getShort(key), key, valueDefault)
+    envGetShort(CakeConfCacheService.confCacheServiceApi.getShort(key), key, valueDefault)
 
   private def envGetShort(ans: Either[String, Option[Short]], key: String, valueDefault: Short): Short =
     ans fold (
@@ -28,7 +28,7 @@ trait ConfShortSupport extends TypesSupport {
         valueDefault
       },
       opt => opt map (value => {
-        CakeCacheService.cacheServiceApi.set(key, value.toString)
+        CakeConfCacheService.confCacheServiceApi.set(key, value.toString)
         value
       }) getOrElse {
         if (logger.isInfoEnabled) {

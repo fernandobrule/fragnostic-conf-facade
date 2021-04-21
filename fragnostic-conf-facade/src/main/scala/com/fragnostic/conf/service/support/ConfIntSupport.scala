@@ -1,7 +1,7 @@
 package com.fragnostic.conf.service.support
 
 import com.fragnostic.conf.base.service.support.TypesSupport
-import com.fragnostic.conf.cache.service.{ CakeCacheService, CakeConfCacheService }
+import com.fragnostic.conf.cache.service.CakeConfCacheService
 import com.fragnostic.conf.db.service.CakeConfDbService
 import com.fragnostic.conf.env.service.CakeConfEnvService
 import com.fragnostic.conf.props.service.CakeConfPropsService
@@ -13,7 +13,7 @@ trait ConfIntSupport extends TypesSupport {
   private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
 
   def cacheGetInt(key: String, valueDefault: Int): Int =
-    envGetInt(CakeConfCacheService.confServiceApi.getInt(key), key, valueDefault)
+    envGetInt(CakeConfCacheService.confCacheServiceApi.getInt(key), key, valueDefault)
 
   private def envGetInt(ans: Either[String, Option[Int]], key: String, valueDefault: Int): Int =
     ans fold (
@@ -29,7 +29,7 @@ trait ConfIntSupport extends TypesSupport {
         valueDefault
       },
       opt => opt map (value => {
-        CakeCacheService.cacheServiceApi.set(key, value.toString)
+        CakeConfCacheService.confCacheServiceApi.set(key, value.toString)
         value
       }) getOrElse {
         if (logger.isInfoEnabled) {
