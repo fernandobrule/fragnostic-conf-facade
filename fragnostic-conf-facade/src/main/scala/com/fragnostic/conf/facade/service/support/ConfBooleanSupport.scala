@@ -1,7 +1,7 @@
-package com.fragnostic.conf.service.support
+package com.fragnostic.conf.facade.service.support
 
 import com.fragnostic.conf.base.service.support.TypesSupport
-import com.fragnostic.conf.cache.service.{ CakeCacheService, CakeConfCacheService }
+import com.fragnostic.conf.cache.service.CakeConfCacheService
 import com.fragnostic.conf.db.service.CakeConfDbService
 import com.fragnostic.conf.env.service.CakeConfEnvService
 import com.fragnostic.conf.props.service.CakeConfPropsService
@@ -12,7 +12,7 @@ trait ConfBooleanSupport extends TypesSupport {
   private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
 
   def cacheGetBoolean(key: String, valueDefault: Boolean): Boolean =
-    envGetBoolean(CakeConfCacheService.confServiceApi.getBoolean(key), key, valueDefault)
+    envGetBoolean(CakeConfCacheService.confCacheService.getBoolean(key), key, valueDefault)
 
   private def envGetBoolean(ans: Either[String, Option[Boolean]], key: String, valueDefault: Boolean): Boolean =
     ans fold (
@@ -22,13 +22,13 @@ trait ConfBooleanSupport extends TypesSupport {
       })
 
   private def envGetBoolean(key: String, valueDefault: Boolean): Boolean = {
-    propsGetBoolean(CakeConfEnvService.confServiceApi.getBoolean(key), key) fold (
+    propsGetBoolean(CakeConfEnvService.confEnvService.getBoolean(key), key) fold (
       error => {
         logger.error(s"envGetBoolean() -\n\t$error\n")
         valueDefault
       },
       opt => opt map (value => {
-        CakeCacheService.cacheServiceApi.set(key, value.toString)
+        CakeConfCacheService.confCacheService.set(key, value.toString)
         value
       }) getOrElse {
         if (logger.isInfoEnabled) {
@@ -50,7 +50,7 @@ trait ConfBooleanSupport extends TypesSupport {
     )
 
   private def dbGetBoolean(key: String): Either[String, Option[Boolean]] =
-    CakeConfDbService.confServiceApi.getBoolean(key)
+    CakeConfDbService.confDbService.getBoolean(key)
 
 }
 
