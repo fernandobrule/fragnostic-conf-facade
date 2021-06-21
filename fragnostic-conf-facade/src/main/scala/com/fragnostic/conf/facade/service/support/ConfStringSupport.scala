@@ -11,7 +11,7 @@ import java.util.Locale
 
 trait ConfStringSupport extends TypesSupport {
 
-  private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
+  private[this] val logger: Logger = LoggerFactory.getLogger("ConfStringSupport")
 
   def cacheGetString(key: String, valueDefault: String): String =
     envGetString(CakeConfCacheService.confCacheService.getString(key), key, valueDefault)

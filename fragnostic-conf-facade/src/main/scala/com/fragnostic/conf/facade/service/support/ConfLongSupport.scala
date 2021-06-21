@@ -9,7 +9,7 @@ import org.slf4j.{ Logger, LoggerFactory }
 
 trait ConfLongSupport extends TypesSupport {
 
-  private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
+  private[this] val logger: Logger = LoggerFactory.getLogger("ConfLongSupport")
 
   def cacheGetLong(key: String, valueDefault: Long): Long =
     envGetLong(CakeConfCacheService.confCacheService.getLong(key), key, valueDefault)

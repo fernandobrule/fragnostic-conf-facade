@@ -9,7 +9,7 @@ import org.slf4j.{ Logger, LoggerFactory }
 
 trait ConfShortSupport extends TypesSupport {
 
-  private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
+  private[this] val logger: Logger = LoggerFactory.getLogger("ConfShortSupport")
 
   def cacheGetShort(key: String, valueDefault: Short): Short =
     envGetShort(CakeConfCacheService.confCacheService.getShort(key), key, valueDefault)
