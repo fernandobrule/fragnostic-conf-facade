@@ -10,7 +10,7 @@ import org.slf4j.{ Logger, LoggerFactory }
 @SerialVersionUID(234234234L)
 trait ConfIntSupport extends TypesSupport {
 
-  private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
+  private[this] val logger: Logger = LoggerFactory.getLogger("ConfIntSupport")
 
   def cacheGetInt(key: String, valueDefault: Int): Int =
     envGetInt(CakeConfCacheService.confCacheService.getInt(key), key, valueDefault)

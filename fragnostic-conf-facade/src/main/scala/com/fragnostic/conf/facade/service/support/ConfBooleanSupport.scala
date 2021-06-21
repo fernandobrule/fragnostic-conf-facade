@@ -9,7 +9,7 @@ import org.slf4j.{ Logger, LoggerFactory }
 
 trait ConfBooleanSupport extends TypesSupport {
 
-  private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
+  private[this] val logger: Logger = LoggerFactory.getLogger("ConfBooleanSupport")
 
   def cacheGetBoolean(key: String, valueDefault: Boolean): Boolean =
     envGetBoolean(CakeConfCacheService.confCacheService.getBoolean(key), key, valueDefault)
