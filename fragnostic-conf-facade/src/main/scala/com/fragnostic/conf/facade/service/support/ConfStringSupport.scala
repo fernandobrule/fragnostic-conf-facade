@@ -43,9 +43,7 @@ trait ConfStringSupport extends TypesSupport {
         CakeConfCacheService.confCacheService.set(key, value)
         value
       }) getOrElse {
-        if (logger.isInfoEnabled) {
-          logger.info(s"envGetString() -\n\tooooops, we are about to return value default[$valueDefault] for key[$key]\n")
-        }
+        logger.warn(s"envGetString() -\n\tooooops, we are about to return value default[$valueDefault] for key[$key] that does not exists\n")
         valueDefault
       })
 
@@ -59,9 +57,7 @@ trait ConfStringSupport extends TypesSupport {
         CakeConfCacheService.confCacheService.set(key, value)
         value
       }) getOrElse {
-        if (logger.isInfoEnabled) {
-          logger.info(s"envGetString() -\n\tooooops, we are about to return value default[$valueDefault] for key[$key]\n")
-        }
+        logger.warn(s"envGetString() -\n\tooooops, we are about to return value default[$valueDefault] for key[$key] that does not exists\n")
         valueDefault
       })
 

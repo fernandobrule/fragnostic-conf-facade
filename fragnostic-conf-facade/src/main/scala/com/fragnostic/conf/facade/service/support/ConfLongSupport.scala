@@ -31,9 +31,7 @@ trait ConfLongSupport extends TypesSupport {
         CakeConfCacheService.confCacheService.set(key, value.toString)
         value
       }) getOrElse {
-        if (logger.isInfoEnabled) {
-          logger.info(s"envGetLong() -\n\tooooops, we are about to return value default[$valueDefault] for key[$key]\n")
-        }
+        logger.warn(s"envGetLong() -\n\tooooops, we are about to return value default[$valueDefault] for key[$key] that does not exists\n")
         valueDefault
       })
   }
