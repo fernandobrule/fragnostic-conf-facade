@@ -14,12 +14,11 @@ trait ConfBooleanSupport extends TypesSupport {
   def cacheGetBoolean(key: String, valueDefault: Boolean): Boolean =
     envGetBoolean(CakeConfCacheService.confCacheService.getBoolean(key), key, valueDefault)
 
-  private def envGetBoolean(ans: Either[String, Option[Boolean]], key: String, valueDefault: Boolean): Boolean =
+  private def envGetBoolean(ans: Either[String, Boolean], key: String, valueDefault: Boolean): Boolean =
     ans fold (
       error => envGetBoolean(key, valueDefault),
-      opt => opt map (value => value) getOrElse {
-        envGetBoolean(key, valueDefault)
-      })
+      opt => opt //
+    )
 
   private def envGetBoolean(key: String, valueDefault: Boolean): Boolean = {
     propsGetBoolean(CakeConfEnvService.confEnvService.getBoolean(key), key) fold (
@@ -27,27 +26,23 @@ trait ConfBooleanSupport extends TypesSupport {
         logger.error(s"envGetBoolean() -\n\t$error\n")
         valueDefault
       },
-      opt => opt map (value => {
-        CakeConfCacheService.confCacheService.set(key, value.toString)
-        value
-      }) getOrElse {
-        logger.warn(s"envGetBoolean() -\n\tooooops, we are about to return value default[$valueDefault] for key[$key] that does not exists\n")
-        valueDefault
-      })
+      opt => opt //
+    )
   }
 
-  private def propsGetBoolean(ans: Either[String, Option[Boolean]], key: String): Either[String, Option[Boolean]] =
+  private def propsGetBoolean(ans: Either[String, Boolean], key: String): Either[String, Boolean] =
     ans fold (
       error => dbGetBoolean(CakeConfPropsService.confServiceApi.getBoolean(key), key),
-      opt => opt map (value => Right(Option(value))) getOrElse dbGetBoolean(CakeConfPropsService.confServiceApi.getBoolean(key), key))
-
-  private def dbGetBoolean(ans: Either[String, Option[Boolean]], key: String): Either[String, Option[Boolean]] =
-    ans fold (
-      error => dbGetBoolean(key), //
-      opt => opt map (value => Right(Option(value))) getOrElse dbGetBoolean(key) //
+      value => Right(value) //
     )
 
-  private def dbGetBoolean(key: String): Either[String, Option[Boolean]] =
+  private def dbGetBoolean(ans: Either[String, Boolean], key: String): Either[String, Boolean] =
+    ans fold (
+      error => dbGetBoolean(key), //
+      value => Right(value) //
+    )
+
+  private def dbGetBoolean(key: String): Either[String, Boolean] =
     CakeConfDbService.confDbService.getBoolean(key)
 
 }

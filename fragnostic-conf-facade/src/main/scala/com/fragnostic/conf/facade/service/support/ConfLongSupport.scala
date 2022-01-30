@@ -14,12 +14,11 @@ trait ConfLongSupport extends TypesSupport {
   def cacheGetLong(key: String, valueDefault: Long): Long =
     envGetLong(CakeConfCacheService.confCacheService.getLong(key), key, valueDefault)
 
-  private def envGetLong(ans: Either[String, Option[Long]], key: String, valueDefault: Long): Long =
+  private def envGetLong(ans: Either[String, Long], key: String, valueDefault: Long): Long =
     ans fold (
       error => envGetLong(key, valueDefault),
-      opt => opt map (value => value) getOrElse {
-        envGetLong(key, valueDefault)
-      })
+      opt => opt //
+    )
 
   private def envGetLong(key: String, valueDefault: Long): Long = {
     propsGetLong(CakeConfEnvService.confEnvService.getLong(key), key) fold (
@@ -27,27 +26,23 @@ trait ConfLongSupport extends TypesSupport {
         logger.error(s"envGetLong() -\n\t$error\n")
         valueDefault
       },
-      opt => opt map (value => {
-        CakeConfCacheService.confCacheService.set(key, value.toString)
-        value
-      }) getOrElse {
-        logger.warn(s"envGetLong() -\n\tooooops, we are about to return value default[$valueDefault] for key[$key] that does not exists\n")
-        valueDefault
-      })
+      opt => opt //
+    )
   }
 
-  private def propsGetLong(ans: Either[String, Option[Long]], key: String): Either[String, Option[Long]] =
+  private def propsGetLong(ans: Either[String, Long], key: String): Either[String, Long] =
     ans fold (
       error => dbGetLong(CakeConfPropsService.confServiceApi.getLong(key), key),
-      opt => opt map (value => Right(Option(value))) getOrElse dbGetLong(CakeConfPropsService.confServiceApi.getLong(key), key))
-
-  private def dbGetLong(ans: Either[String, Option[Long]], key: String): Either[String, Option[Long]] =
-    ans fold (
-      error => dbGetLong(key), //
-      opt => opt map (value => Right(Option(value))) getOrElse dbGetLong(key) //
+      opt => Right(opt) //
     )
 
-  private def dbGetLong(key: String): Either[String, Option[Long]] =
+  private def dbGetLong(ans: Either[String, Long], key: String): Either[String, Long] =
+    ans fold (
+      error => dbGetLong(key), //
+      value => Right(value) //
+    )
+
+  private def dbGetLong(key: String): Either[String, Long] =
     CakeConfDbService.confDbService.getLong(key)
 
 }

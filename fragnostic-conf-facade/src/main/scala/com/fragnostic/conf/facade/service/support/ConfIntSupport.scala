@@ -15,40 +15,34 @@ trait ConfIntSupport extends TypesSupport {
   def cacheGetInt(key: String, valueDefault: Int): Int =
     envGetInt(CakeConfCacheService.confCacheService.getInt(key), key, valueDefault)
 
-  private def envGetInt(ans: Either[String, Option[Int]], key: String, valueDefault: Int): Int =
+  private def envGetInt(ans: Either[String, Int], key: String, valueDefault: Int): Int =
     ans fold (
       error => envGetInt(key, valueDefault),
-      opt => opt map (value => value) getOrElse {
-        envGetInt(key, valueDefault)
-      })
+      opt => opt //
+    )
 
-  private def envGetInt(key: String, valueDefault: Int): Int = {
+  private def envGetInt(key: String, valueDefault: Int): Int =
     propsGetInt(CakeConfEnvService.confEnvService.getInt(key), key) fold (
       error => {
         logger.error(s"envGetInt() -\n\t$error\n")
         valueDefault
       },
-      opt => opt map (value => {
-        CakeConfCacheService.confCacheService.set(key, value.toString)
-        value
-      }) getOrElse {
-        logger.warn(s"envGetInt() -\n\tooooops, we are about to return value default[$valueDefault] for key[$key] that does not exists\n")
-        valueDefault
-      })
-  }
-
-  private def propsGetInt(ans: Either[String, Option[Int]], key: String): Either[String, Option[Int]] =
-    ans fold (
-      error => dbGetInt(CakeConfPropsService.confServiceApi.getInt(key), key),
-      opt => opt map (value => Right(Option(value))) getOrElse dbGetInt(CakeConfPropsService.confServiceApi.getInt(key), key))
-
-  private def dbGetInt(ans: Either[String, Option[Int]], key: String): Either[String, Option[Int]] =
-    ans fold (
-      error => dbGetInt(key), //
-      opt => opt map (value => Right(Option(value))) getOrElse dbGetInt(key) //
+      opt => opt //
     )
 
-  private def dbGetInt(key: String): Either[String, Option[Int]] =
+  private def propsGetInt(ans: Either[String, Int], key: String): Either[String, Int] =
+    ans fold (
+      error => dbGetInt(CakeConfPropsService.confServiceApi.getInt(key), key),
+      opt => Right(opt) //
+    )
+
+  private def dbGetInt(ans: Either[String, Int], key: String): Either[String, Int] =
+    ans fold (
+      error => dbGetInt(key), //
+      opt => Right(opt) //
+    )
+
+  private def dbGetInt(key: String): Either[String, Int] =
     CakeConfDbService.confDbService.getInt(key)
 
 }
