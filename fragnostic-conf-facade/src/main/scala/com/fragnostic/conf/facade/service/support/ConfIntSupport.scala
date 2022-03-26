@@ -5,27 +5,24 @@ import com.fragnostic.conf.cache.service.CakeConfCacheService
 import com.fragnostic.conf.env.service.CakeConfEnvService
 import com.fragnostic.conf.props.service.CakeConfPropsService
 
-trait ConfIntSupport extends TypesSupport {
+trait ConfIntSupport extends TypesSupport with CacheSupport {
 
   def cacheGetInt(key: String, valueDefault: Int): Int =
-    envGetInt(CakeConfCacheService.confCacheService.getInt(key), key, valueDefault)
-
-  private def envGetInt(ans: Either[String, Int], key: String, valueDefault: Int): Int =
-    ans fold (
+    CakeConfCacheService.confCacheService.getInt(key) fold (
       error => envGetInt(key, valueDefault),
-      opt => opt //
+      value => value //
     )
 
   private def envGetInt(key: String, valueDefault: Int): Int =
-    propsGetInt(CakeConfEnvService.confEnvService.getInt(key), key) fold (
-      error => valueDefault,
-      opt => opt //
+    CakeConfEnvService.confEnvService.getInt(key) fold (
+      error => propsGetInt(key, valueDefault),
+      value => addToCache(key, value) //
     )
 
-  private def propsGetInt(ans: Either[String, Int], key: String): Either[String, Int] =
-    ans fold (
-      error => CakeConfPropsService.confServiceApi.getInt(key),
-      opt => Right(opt) //
+  private def propsGetInt(key: String, valueDefault: Int): Int =
+    CakeConfPropsService.confServiceApi.getInt(key) fold (
+      error => valueDefault,
+      value => addToCache(key, value) //
     )
 
 }

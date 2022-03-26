@@ -5,28 +5,25 @@ import com.fragnostic.conf.cache.service.CakeConfCacheService
 import com.fragnostic.conf.env.service.CakeConfEnvService
 import com.fragnostic.conf.props.service.CakeConfPropsService
 
-trait ConfLongSupport extends TypesSupport {
+trait ConfLongSupport extends TypesSupport with CacheSupport {
 
   def cacheGetLong(key: String, valueDefault: Long): Long =
-    envGetLong(CakeConfCacheService.confCacheService.getLong(key), key, valueDefault)
-
-  private def envGetLong(ans: Either[String, Long], key: String, valueDefault: Long): Long =
-    ans fold (
+    CakeConfCacheService.confCacheService.getLong(key) fold (
       error => envGetLong(key, valueDefault),
-      opt => opt //
+      value => value //
     )
 
   private def envGetLong(key: String, valueDefault: Long): Long = {
-    propsGetLong(CakeConfEnvService.confEnvService.getLong(key), key) fold (
-      error => valueDefault,
-      opt => opt //
+    CakeConfEnvService.confEnvService.getLong(key) fold (
+      error => propsGetLong(key, valueDefault),
+      value => addToCache(key, value) //
     )
   }
 
-  private def propsGetLong(ans: Either[String, Long], key: String): Either[String, Long] =
-    ans fold (
-      error => CakeConfPropsService.confServiceApi.getLong(key),
-      opt => Right(opt) //
+  private def propsGetLong(key: String, valueDefault: Long): Long =
+    CakeConfPropsService.confServiceApi.getLong(key) fold (
+      error => valueDefault,
+      value => addToCache(key, value) //
     )
 
 }

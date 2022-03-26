@@ -1,54 +1,48 @@
 package com.fragnostic.conf.facade.service.support
 
-import com.fragnostic.conf.base.service.support.TypesSupport
+import com.fragnostic.conf.base.service.support.{ KeyComposeSupport, TypesSupport }
 import com.fragnostic.conf.cache.service.CakeConfCacheService
 import com.fragnostic.conf.env.service.CakeConfEnvService
 import com.fragnostic.conf.props.service.CakeConfPropsService
 
 import java.util.Locale
 
-trait ConfStringSupport extends TypesSupport {
+trait ConfStringSupport extends TypesSupport with CacheSupport with KeyComposeSupport {
 
   def cacheGetString(key: String, valueDefault: String): String =
-    envGetString(CakeConfCacheService.confCacheService.getString(key), key, valueDefault)
-
-  def cacheGetString(locale: Locale, key: String, valueDefault: String): String =
-    envGetString(locale, key, valueDefault, CakeConfCacheService.confCacheService.getString(locale, key))
-
-  private def envGetString(ans: Either[String, String], key: String, valueDefault: String): String =
-    ans fold (
+    CakeConfCacheService.confCacheService.getString(key) fold (
       error => envGetString(key, valueDefault),
       value => value //
     )
 
-  private def envGetString(locale: Locale, key: String, valueDefault: String, ans: Either[String, String]): String =
-    ans fold (
+  private def envGetString(key: String, valueDefault: String): String =
+    CakeConfEnvService.confEnvService.getString(key) fold (
+      error => propsGetString(key, valueDefault),
+      value => addToCache(key, value) //
+    )
+
+  private def propsGetString(key: String, valueDefault: String): String =
+    CakeConfPropsService.confServiceApi.getString(key) fold (
+      error => valueDefault,
+      value => addToCache(key, value) //
+    )
+
+  def cacheGetString(locale: Locale, key: String, valueDefault: String): String =
+    CakeConfCacheService.confCacheService.getString(locale, key) fold (
       error => envGetString(locale, key, valueDefault),
       value => value //
     )
 
-  private def envGetString(key: String, valueDefault: String): String =
-    propsGetString(CakeConfEnvService.confEnvService.getString(key), key) fold (
-      error => valueDefault,
-      opt => opt //
-    )
-
   private def envGetString(locale: Locale, key: String, valueDefault: String): String =
-    propsGetString(locale, key, CakeConfEnvService.confEnvService.getString(locale, key)) fold (
+    CakeConfEnvService.confEnvService.getString(locale, key) fold (
+      error => propsGetString(locale, key, valueDefault),
+      value => addToCache(compose(locale, key), value) //
+    )
+
+  private def propsGetString(locale: Locale, key: String, valueDefault: String): String =
+    CakeConfPropsService.confServiceApi.getString(key) fold (
       error => valueDefault,
-      opt => opt //
-    )
-
-  private def propsGetString(ans: Either[String, String], key: String): Either[String, String] =
-    ans fold ( //
-      error => CakeConfPropsService.confServiceApi.getString(key),
-      value => Right(value) //
-    )
-
-  private def propsGetString(locale: Locale, key: String, ans: Either[String, String]): Either[String, String] =
-    ans fold ( //
-      error => CakeConfPropsService.confServiceApi.getString(key), //
-      value => Right(value) //
+      value => addToCache(compose(locale, key), value) //
     )
 
 }

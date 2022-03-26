@@ -5,28 +5,25 @@ import com.fragnostic.conf.cache.service.CakeConfCacheService
 import com.fragnostic.conf.env.service.CakeConfEnvService
 import com.fragnostic.conf.props.service.CakeConfPropsService
 
-trait ConfBooleanSupport extends TypesSupport {
+trait ConfBooleanSupport extends TypesSupport with CacheSupport {
 
   def cacheGetBoolean(key: String, valueDefault: Boolean): Boolean =
-    envGetBoolean(CakeConfCacheService.confCacheService.getBoolean(key), key, valueDefault)
-
-  private def envGetBoolean(ans: Either[String, Boolean], key: String, valueDefault: Boolean): Boolean =
-    ans fold (
+    CakeConfCacheService.confCacheService.getBoolean(key) fold (
       error => envGetBoolean(key, valueDefault),
-      opt => opt //
+      value => value //
     )
 
   private def envGetBoolean(key: String, valueDefault: Boolean): Boolean = {
-    propsGetBoolean(CakeConfEnvService.confEnvService.getBoolean(key), key) fold (
-      error => valueDefault,
-      opt => opt //
+    CakeConfEnvService.confEnvService.getBoolean(key) fold (
+      error => propsGetBoolean(key, valueDefault),
+      value => addToCache(key, value) //
     )
   }
 
-  private def propsGetBoolean(ans: Either[String, Boolean], key: String): Either[String, Boolean] =
-    ans fold (
-      error => CakeConfPropsService.confServiceApi.getBoolean(key),
-      value => Right(value) //
+  private def propsGetBoolean(key: String, valueDefault: Boolean): Boolean =
+    CakeConfPropsService.confServiceApi.getBoolean(key) fold (
+      error => valueDefault,
+      value => addToCache(key, value) //
     )
 
 }
