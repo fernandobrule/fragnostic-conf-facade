@@ -98,7 +98,6 @@ lazy val fragnosticConfFacade = Project(
     fragnosticConfCache,
     fragnosticConfEnv,
     fragnosticConfProps
-    //fragnosticConfDb
   ),
   description := "fragnostic conf facade"
 )
