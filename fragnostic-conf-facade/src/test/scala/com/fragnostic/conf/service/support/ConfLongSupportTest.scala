@@ -18,7 +18,7 @@ class ConfLongSupportTest extends AnyFunSpec with BeforeAndAfterEach with ConfLo
   describe("***Conf Long Support Test***") {
 
     it("Can Retrieve Long") {
-      assertResult(cacheGetLong("FOCUSED_CALENDAR_SERVICE_TODAY_MINUS_DAYS", 5))(56)
+      assertResult(cacheGetLong("SOME_LONG_VALUE", 5))(56)
     }
 
   }
