@@ -92,6 +92,8 @@ lazy val fragnosticConfFacade = Project(
       fragnosticConfCache,
       fragnosticConfEnv,
       fragnosticConfProps,
+      fragnosticSupport,
+      lettuce,
       logbackClassic,
       scalatestFunSpec,
       slf4jApi
