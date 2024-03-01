@@ -3,9 +3,9 @@ import sbt._
 object Dependencies {
 
   lazy val fragnosticConfBase      = "com.fragnostic"        % "fragnostic-conf-base_2.13"           % "0.1.8"
-  lazy val fragnosticConfCache     = "com.fragnostic"        % "fragnostic-conf-cache_2.13"          % "0.2.9"
-  lazy val fragnosticConfEnv       = "com.fragnostic"        %  "fragnostic-conf-env_2.13"           % "0.1.11"
-  lazy val fragnosticConfProps     = "com.fragnostic"        % "fragnostic-conf-props_2.13"          % "0.1.9"
+  lazy val fragnosticConfCache     = "com.fragnostic"        % "fragnostic-conf-cache_2.13"          % "0.2.10"
+  lazy val fragnosticConfEnv       = "com.fragnostic"        %  "fragnostic-conf-env_2.13"           % "0.1.12"
+  lazy val fragnosticConfProps     = "com.fragnostic"        % "fragnostic-conf-props_2.13"          % "0.1.10"
   lazy val fragnosticSupport       = "com.fragnostic"        % "fragnostic-support_2.13"             % "0.1.19"
   lazy val lettuce                 = "io.lettuce"            %  "lettuce-core"                       % "6.3.1.RELEASE"
   lazy val logbackClassic          = "ch.qos.logback"        % "logback-classic"                     % "1.5.0" % "runtime"
